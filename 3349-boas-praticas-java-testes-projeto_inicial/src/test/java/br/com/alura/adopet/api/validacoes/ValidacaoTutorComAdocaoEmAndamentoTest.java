@@ -35,13 +35,16 @@ class ValidacaoTutorComAdocaoEmAndamentoTest {
     private Tutor tutor = new Tutor(new CadastroTutorDto("TutorTeste", "(11)11234-1234", "teste@teste.com.br"));
 
     @Mock
+    private Tutor outroTutor;
+
+    @Mock
     private Pet pet;
 
     @Mock
     private SolicitacaoAdocaoDto dto;
 
     @Test
-    void deveriaPermitirSolicitacaoDeAdocao() {
+    void naoDeveriaPermitirSolicitacaoDeAdocao() {
         //ARRANGE
         List<Adocao> adocoesMock = List.of(new Adocao(tutor, pet, "Teste"));
         BDDMockito.given(adocaoRepository.findAll()).willReturn(adocoesMock);
@@ -49,5 +52,16 @@ class ValidacaoTutorComAdocaoEmAndamentoTest {
 
         //ACT + ASSERT
         Assertions.assertThrows(ValidacaoException.class, () -> validacaoTutorComAdocaoEmAndamento.validar(dto));
+    }
+
+    @Test
+    void deveriaPermitirSolicitacaoDeAdocao() {
+        //ARRANGE
+        List<Adocao> adocoesMock = List.of(new Adocao(tutor, pet, "Teste"));
+        BDDMockito.given(adocaoRepository.findAll()).willReturn(adocoesMock);
+        BDDMockito.given(tutorRepository.getReferenceById(BDDMockito.anyLong())).willReturn(outroTutor);
+
+        //ACT + ASSERT
+        Assertions.assertDoesNotThrow(() -> validacaoTutorComAdocaoEmAndamento.validar(dto));
     }
 }
